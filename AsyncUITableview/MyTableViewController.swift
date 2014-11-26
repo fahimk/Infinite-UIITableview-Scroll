@@ -12,9 +12,9 @@ import Foundation
 class MyTableViewController: UITableViewController {
     
     let PageSize = 20
-    var items:MyItem[] = []
+    var items:[MyItem] = []
     var isLoading = false
-    @IBOutlet var MyFooterView : UIView
+    @IBOutlet var MyFooterView : UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,7 +38,7 @@ class MyTableViewController: UITableViewController {
     }
     
     class DataManager {
-        func requestData(offset:Int, size:Int, listener:(MyItem[]) -> ()) {
+        func requestData(offset:Int, size:Int, listener:([MyItem]) -> ()) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 
                 //Sleep the Process
@@ -47,9 +47,9 @@ class MyTableViewController: UITableViewController {
                 }
                 
                 //generate items
-                var arr:MyItem[] = []
+                var arr:[MyItem] = []
                 for i in offset...(offset + size) {
-                    arr += MyItem(name: "Item " + String(i))
+                    arr.append(MyItem(name: "Item " + String(i)))
                 }
                 
                 println(arr)
@@ -69,7 +69,7 @@ class MyTableViewController: UITableViewController {
             
             let manager = DataManager()
             manager.requestData(offset, size: size,
-                listener: {(items:MyTableViewController.MyItem[]) -> () in
+                listener: {(items:[MyTableViewController.MyItem]) -> () in
                     
                     /*
                     //You can also Reload all the Data using below code.
@@ -92,7 +92,7 @@ class MyTableViewController: UITableViewController {
                     for item in items {
                         var row = self.items.count
                         var indexPath = NSIndexPath(forRow:row,inSection:0)
-                        self.items += item
+                        self.items.append(item)
                         self.tableView?.insertRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)
                     }
                     self.isLoading = false
@@ -102,7 +102,7 @@ class MyTableViewController: UITableViewController {
         }
     }
     
-    override func scrollViewDidScroll(scrollView: UIScrollView!) {
+    override func scrollViewDidScroll(scrollView: UIScrollView) {
         var offset = scrollView.contentOffset.y
         var maxOffset = scrollView.contentSize.height - scrollView.frame.size.height
         if (maxOffset - offset) <= 40 {
@@ -117,15 +117,15 @@ class MyTableViewController: UITableViewController {
     override func tableView(tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
-    override func tableView(tableView: UITableView!, heightForRowAtIndexPath indexPath: NSIndexPath!) -> CGFloat {
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 85;
     }
-    override func tableView(tableView: UITableView!, cellForRowAtIndexPath indexPath: NSIndexPath!) -> UITableViewCell? {
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell : MyTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as MyTableViewCell
 
         //Configure the cell...
         var imagename = UTILITY.getRandomNumberBetween(1, To: 10).description + ".png"
-        cell.img.image = UIImage(named:imagename) as UIImage
+        cell.img.image = UIImage(named:imagename)! as UIImage
         cell.lbl.text = items[indexPath.row].name as String
         return cell
     }
